@@ -1,0 +1,133 @@
+
+
+CREATE TABLE hostels (
+    hostel_id   INT PRIMARY KEY AUTO_INCREMENT,
+    hostel_name VARCHAR(100) NOT NULL,
+    gender_type VARCHAR(10)  NOT NULL,
+    warden_name VARCHAR(100) NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE rooms (
+    room_id     INT PRIMARY KEY AUTO_INCREMENT,
+    hostel_id   INT NOT NULL,
+    room_number VARCHAR(10)  NOT NULL,
+    room_type   VARCHAR(20)  NOT NULL,
+    capacity    INT          NOT NULL,
+    monthly_fee DECIMAL(8,2) NOT NULL,
+    FOREIGN KEY (hostel_id) REFERENCES hostels(hostel_id)
+);
+
+
+CREATE TABLE students (
+    student_id  INT PRIMARY KEY AUTO_INCREMENT,
+    reg_number  VARCHAR(20)  NOT NULL UNIQUE,
+    full_name   VARCHAR(100) NOT NULL,
+    email       VARCHAR(100) NOT NULL UNIQUE,
+    course      VARCHAR(100) NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE allocations (
+    allocation_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id    INT  NOT NULL,
+    room_id       INT  NOT NULL,
+    check_in_date DATE NOT NULL,
+    status        VARCHAR(20) DEFAULT 'Active',
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (room_id)    REFERENCES rooms(room_id)
+);
+
+CREATE TABLE payments (
+    payment_id     INT PRIMARY KEY AUTO_INCREMENT,
+    allocation_id  INT          NOT NULL,
+    amount         DECIMAL(8,2) NOT NULL,
+    payment_date   DATE         NOT NULL,
+    payment_method VARCHAR(30)  NOT NULL,
+    FOREIGN KEY (allocation_id) REFERENCES allocations(allocation_id)
+);
+
+CREATE TABLE amenities (
+    amenity_id   INT PRIMARY KEY AUTO_INCREMENT,
+    amenity_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE hostel_amenities (
+    hostel_id  INT NOT NULL,
+    amenity_id INT NOT NULL,
+    PRIMARY KEY (hostel_id, amenity_id),
+    FOREIGN KEY (hostel_id)  REFERENCES hostels(hostel_id),
+    FOREIGN KEY (amenity_id) REFERENCES amenities(amenity_id)
+);
+
+
+
+INSERT INTO hostels (hostel_name, gender_type, warden_name) VALUES
+('Sunrise Boys Hostel', 'Male',   'Mr. Govind Rao'),
+('Lotus Girls Hostel',  'Female', 'Mrs. Anitha Krishnan');
+
+INSERT INTO rooms (hostel_id, room_number, room_type, capacity, monthly_fee) VALUES
+(1, '101', 'Single', 1, 3500.00),
+(1, '102', 'Double', 2, 2800.00),
+(2, '101', 'Single', 1, 3500.00),
+(2, '102', 'Double', 2, 2800.00);
+
+INSERT INTO students (reg_number, full_name, email, course) VALUES
+('REG001', 'Arjun Sharma', 'arjun@campus.edu', 'Computer Science'),
+('REG002', 'Priya Nair',   'priya@campus.edu', 'Electronics Eng.'),
+('REG003', 'Rohit Verma',  'rohit@campus.edu', 'Mechanical Eng.');
+
+INSERT INTO allocations (student_id, room_id, check_in_date, status) VALUES
+(1, 1, '2024-07-01', 'Active'),
+(2, 3, '2024-07-01', 'Active'),
+(3, 2, '2024-07-01', 'Active');
+
+INSERT INTO payments (allocation_id, amount, payment_date, payment_method) VALUES
+(1, 3500.00, '2024-07-05', 'Online'),
+(2, 3500.00, '2024-07-05', 'Online'),
+(3, 2800.00, '2024-07-06', 'Cash'),
+(1, 3500.00, '2024-08-05', 'Online');
+
+INSERT INTO amenities (amenity_name) VALUES
+('WiFi'), ('Laundry'), ('CCTV'), ('Study Room');
+
+INSERT INTO hostel_amenities (hostel_id, amenity_id) VALUES
+(1, 1), (1, 3), (1, 4),
+(2, 1), (2, 2), (2, 3), (2, 4);
+
+
+
+
+SELECT s.reg_number, s.full_name, h.hostel_name, r.room_number, r.monthly_fee
+FROM students s
+JOIN allocations a ON s.student_id = a.student_id AND a.status = 'Active'
+JOIN rooms r       ON a.room_id    = r.room_id
+JOIN hostels h     ON r.hostel_id  = h.hostel_id;
+
+
+SELECT h.hostel_name, SUM(p.amount) AS total_collected
+FROM payments p
+JOIN allocations a ON p.allocation_id = a.allocation_id
+JOIN rooms r       ON a.room_id       = r.room_id
+JOIN hostels h     ON r.hostel_id     = h.hostel_id
+GROUP BY h.hostel_name;
+
+
+SELECT h.hostel_name, a.amenity_name
+FROM hostels h
+JOIN hostel_amenities ha ON h.hostel_id  = ha.hostel_id
+JOIN amenities a         ON ha.amenity_id = a.amenity_id
+ORDER BY h.hostel_name;
+
+
+SELECT s.full_name, h.hostel_name, r.monthly_fee AS amount_due
+FROM allocations a
+JOIN students s ON a.student_id = s.student_id
+JOIN rooms r    ON a.room_id    = r.room_id
+JOIN hostels h  ON r.hostel_id  = h.hostel_id
+WHERE a.status = 'Active'
+  AND a.allocation_id NOT IN (
+      SELECT allocation_id FROM payments
+      WHERE payment_date BETWEEN '2024-08-01' AND '2024-08-31'
+  );
+
