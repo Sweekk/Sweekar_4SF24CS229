@@ -1,7 +1,7 @@
 
 
-CREATE TABLE hostels (
-    hostel_id   INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS hostels(
+    hostel_id   INT PRIMARY KEY ,
     hostel_name VARCHAR(100) NOT NULL,
     gender_type VARCHAR(10)  NOT NULL,
     warden_name VARCHAR(100) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE hostels (
 );
 
 CREATE TABLE rooms (
-    room_id     INT PRIMARY KEY AUTO_INCREMENT,
+    room_id     INT PRIMARY KEY,
     hostel_id   INT NOT NULL,
     room_number VARCHAR(10)  NOT NULL,
     room_type   VARCHAR(20)  NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE rooms (
 
 
 CREATE TABLE students (
-    student_id  INT PRIMARY KEY AUTO_INCREMENT,
+    student_id  INT PRIMARY KEY ,
     reg_number  VARCHAR(20)  NOT NULL UNIQUE,
     full_name   VARCHAR(100) NOT NULL,
     email       VARCHAR(100) NOT NULL UNIQUE,
@@ -29,7 +29,7 @@ CREATE TABLE students (
 );
 
 CREATE TABLE allocations (
-    allocation_id INT PRIMARY KEY AUTO_INCREMENT,
+    allocation_id INT PRIMARY KEY ,
     student_id    INT  NOT NULL,
     room_id       INT  NOT NULL,
     check_in_date DATE NOT NULL,
@@ -39,16 +39,16 @@ CREATE TABLE allocations (
 );
 
 CREATE TABLE payments (
-    payment_id     INT PRIMARY KEY AUTO_INCREMENT,
-    allocation_id  INT          NOT NULL,
-    amount         DECIMAL(8,2) NOT NULL,
-    payment_date   DATE         NOT NULL,
-    payment_method VARCHAR(30)  NOT NULL,
+    payment_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    allocation_id  INTEGER NOT NULL,
+    amount         REAL NOT NULL,
+    payment_date   TEXT NOT NULL,
+    payment_method TEXT NOT NULL,
     FOREIGN KEY (allocation_id) REFERENCES allocations(allocation_id)
 );
 
 CREATE TABLE amenities (
-    amenity_id   INT PRIMARY KEY AUTO_INCREMENT,
+    amenity_id   INTEGER PRIMARY KEY AUTOINCREMENT,
     amenity_name VARCHAR(100) NOT NULL UNIQUE
 );
 
