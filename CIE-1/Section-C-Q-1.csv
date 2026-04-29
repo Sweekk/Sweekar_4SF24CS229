@@ -1,0 +1,4 @@
+"patient_name","appointment_id","appointment_date","doctor_name","diagnosis_id","medicine_name","dosage","duration"
+Ravi,1,"2026-04-28",Dr. Sharma,1,,,
+Ravi,1,"2026-04-28",Dr. Mehta,1,,,
+Ravi,5,"2026-04-30",Dr. Mehta,,,,
