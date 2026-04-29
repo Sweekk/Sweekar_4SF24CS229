@@ -170,37 +170,3 @@ LEFT JOIN Prescription_Med pm ON pr.prescription_id = pm.prescription_id
 LEFT JOIN Medicine m       ON pm.medicine_id = m.medicine_id
 WHERE p.patient_id = 1;
 
-SELECT
-d.doctor_name,
-COUNT(ad.appointment_id) AS total_consultations
-FROM Doctor d
-JOIN Multi_Doctor ad ON d.doctor_id = ad.doctor_id
-GROUP BY d.doctor_id
-ORDER BY total_consultations DESC
-LIMIT 1;
-
-SELECT
-p.patient_name,
-SUM(b.bill_amount) AS total_outstanding
-FROM Patient p
-JOIN Appointment a ON p.patient_id = a.patient_id
-JOIN Billing b     ON a.appointment_id = b.appointment_id
-JOIN Payment pay   ON b.bill_id = pay.bill_id
-WHERE LOWER(pay.payment_status) = 'pending'
-GROUP BY p.patient_id;
-
-
-DELETE FROM Payment;
-DELETE FROM Billing;
-DELETE FROM Prescription_Med;
-DELETE FROM Prescription;
-DELETE FROM Treatment;
-DELETE FROM Diagnosis;
-DELETE FROM Multi_Doctor;
-DELETE FROM Appointment;
-DELETE FROM Doctor;
-DELETE FROM Medicine;
-DELETE FROM Patient_phone;
-DELETE FROM Patient;
-
-DELETE FROM sqlite_sequence;
