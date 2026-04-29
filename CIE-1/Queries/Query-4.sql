@@ -149,4 +149,29 @@ INSERT INTO Payment (bill_id, payment_status) VALUES
 (5, 'pending'),
 (6, 'paid');
 
+BEGIN TRANSACTION;
+
+INSERT INTO Appointment (appointment_date, patient_id, doctor_id)
+VALUES ('2026-05-01', 1, 1);
+
+INSERT INTO Diagnosis (appointment_id)
+VALUES (last_insert_rowid());
+
+INSERT INTO Treatment (diagnosis_id, medicine_id)
+VALUES (last_insert_rowid(), 1);
+
+INSERT INTO Prescription (appointment_id, treatment_id)
+VALUES (last_insert_rowid(), last_insert_rowid());
+
+INSERT INTO Prescription_Med (prescription_id, medicine_id, dosage, duration)
+VALUES (last_insert_rowid(), 1, '2 times/day', '5 days');
+
+INSERT INTO Billing (bill_amount, appointment_id)
+VALUES (500, last_insert_rowid());
+
+INSERT INTO Payment (bill_id, payment_status)
+VALUES (last_insert_rowid(), 'pending');
+
+COMMIT;
+
 
